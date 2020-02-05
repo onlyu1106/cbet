@@ -1,0 +1,41 @@
+.dice {
+    position: absolute;
+}
+
+.dice1 {
+    background: url('../img/dice.png') no-repeat -507px -2px;
+    width: 98px;
+    height: 96px;
+    transform: scale(0.8) rotate(-20deg);
+    left: 340px;
+    top: 200px;
+    opacity: 0;
+}
+
+.dice2 {
+    background: url('../img/dice.png') no-repeat -404px -3px;
+    width: 98px;
+    height: 96px;
+    transform: scale(0.8) rotate(20deg);
+    left: 300px;
+    top: 270px;
+    opacity: 0;
+}
+
+.dice3 {
+    background: url('../img/dice.png') no-repeat 0 -2px;
+    width: 98px;
+    height: 96px;
+    transform: scale(0.8) rotate(10deg);
+    left: 380px;
+    top: 270px;
+    opacity: 0;
+}
+
+.roll {
+    position: absolute;
+    left: 300px;
+    top: 190px;
+    opacity: 1;
+    width: 180px
+}

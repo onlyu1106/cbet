@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>CBot - Demo Socket Io</title>
+    <link rel="stylesheet" href="css/dice.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <script src="jquery.js"></script>
+    <script src="socket.io/socket.io.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js">
+    </script>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div>
+            <h1 class="alert-warning text-center"><strong id="countDown"></strong></h1>
+        </div>
+        <div class="row">
+            <div class="col-sm-2 border border-dark" id="listDice">
+
+            </div>
+            <div class="col-sm-3">
+                <div class="clearfix">
+                    <button type="button" class="btn btn-success float-left" id="getListDice">Lấy dữ liệu</button>
+                    <button type="button" class="btn btn-primary float-left" id="scanDice">Scan 1</button>
+                    <button type="button" class="btn btn-danger float-left" id="scanDice1">Scan 2</button>
+                    <button type="button" class="btn btn-info float-left" id="scanDice2">Scan 3</button>
+                    <button type="button" class="btn btn-info float-left" id="scanDiceAll">Scan All</button>
+                </div>
+                <label>Chọn seed scan (mặc định seed theo thời gian)</label>
+                <div class="form-check form-check-inline">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="seedByTime" checked>
+                        <label class="form-check-label" for="inlineRadio1">Thời gian</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" name="inlineRadioOptions" type="radio" id="seedById">
+                        <label class="form-check-label" for="inlineRadio1">ID phiên</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" name="inlineRadioOptions" type="radio" id="seedByText">
+                        <label class="form-check-label" for="inlineRadio1">Seed tự chọn</label>
+                    </div>
+                </div>
+                <div>
+                    <input type="email" class="form-control" id="seed" value="0" placeholder="Nhập seed">
+                </div>
+                <div class="clearfix">
+                    <table class="table table-striped table-dark">
+                        <tbody>
+                            <tr>
+                                <td colspan="2" class="text-center">Thời gian</td>
+                                <td colspan="2" class="text-center" id="countDownTable">0</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="text-center">Phiên trước</td>
+                                <td colspan="2" class="text-center" id="lastDiceResult">0</td>
+                            </tr>
+                            <tr class="table-bordered">
+                                <td class="text-center" colspan="2">Tài</td>
+                                <td class="text-center" colspan="2">Xỉu</td>
+                            </tr>
+                            <tr class="table-bordered">
+                                <td class="text-center" style="width: 25%;" id="MemberT">0</td>
+                                <td class="text-center" style="width: 25%;" id="TotalT">0</td>
+                                <td class="text-center" style="width: 25%;" id="MemberX">0</td>
+                                <td class="text-center" style="width: 25%;" id="TotalX">0</td>
+                            </tr>
+                            <tr class="table-bordered">
+                                <td class="text-center" colspan="4" id="scanStatus"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table class="table table-striped table-dark">
+                        <tbody>
+                            <tr>
+                                <td class="text-center" colspan="4">Thống kê theo nút</td>
+                            </tr>
+                            <tr class="table-bordered">
+                                <td class="text-center text-primary" style="width: 25%;"><b>1</b></td>
+                                <td class="text-center" style="width: 25%;" id="_1"><b>0</b></td>
+                                <td class="text-center text-primary" style="width: 25%;"><b>4</b></td>
+                                <td class="text-center" id="_4" style="width: 25%;"><b>0</b></td>
+                            </tr>
+                            <tr class="table-bordered">
+                                <td class="text-center text-primary"><b>2</b></td>
+                                <td class="text-center" id="_2"><b>0</b></td>
+                                <td class="text-center text-primary"><b>5</b></td>
+                                <td class="text-center" id="_5"><b>0</b></td>
+                            </tr>
+                            <tr class="table-bordered">
+                                <td class="text-center text-primary"><b>3</b></td>
+                                <td class="text-center" id="_3"><b>0</b></td>
+                                <td class="text-center text-primary"><b>6</b></td>
+                                <td class="text-center" id="_6"><b>0</b></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table class="table table-bordered table-dark">
+                        <tbody>
+                            <tr>
+                                <td class="text-center" colspan="4">Thống kê kết quả</td>
+                            </tr>
+                            <tr>
+                                <td class="text-center text-danger"><b>3</b></td>
+                                <td class="text-center" id="D3"><b>0</b></td>
+                                <td class="text-center text-danger"><b>11</b></td>
+                                <td class="text-center" id="D11"><b>0</b></td>
+                            </tr>
+                            <tr>
+                                <td class="text-center text-danger"><b>4</b></td>
+                                <td class="text-center" id="D4"><b>0</b></td>
+                                <td class="text-center text-danger"><b>12</b></td>
+                                <td class="text-center" id="D12"><b>0</b></td>
+                            </tr>
+                            <tr>
+                                <td class="text-center text-danger"><b>5</b></td>
+                                <td class="text-center" id="D5"><b>0</b></td>
+                                <td class="text-center text-danger"><b>13</b></td>
+                                <td class="text-center" id="D13"><b>0</b></td>
+                            </tr>
+                            <tr>
+                                <td class="text-center text-danger"><b>6</b></td>
+                                <td class="text-center" id="D6"><b>0</b></td>
+                                <td class="text-center text-danger"><b>14</b></td>
+                                <td class="text-center" id="D14"><b>0</b></td>
+                            </tr>
+                            <tr>
+                                <td class="text-center text-danger"><b>7</b></td>
+                                <td class="text-center" id="D7"><b>0</b></td>
+                                <td class="text-center text-danger"><b>15</b></td>
+                                <td class="text-center" id="D15"><b>0</b></td>
+                            </tr>
+                            <tr>
+                                <td class="text-center text-danger"><b>8</b></td>
+                                <td class="text-center" id="D8"><b>0</b></td>
+                                <td class="text-center text-danger"><b>16</b></td>
+                                <td class="text-center" id="D16"><b>0</b></td>
+                            </tr>
+                            <tr>
+                                <td class="text-center text-danger"><b>9</b></td>
+                                <td class="text-center" id="D9"><b>0</b></td>
+                                <td class="text-center text-danger"><b>17</b></td>
+                                <td class="text-center" id="D17"><b>0</b></td>
+                            </tr>
+                            <tr>
+                                <td class="text-center text-danger"><b>10</b></td>
+                                <td class="text-center" id="D10"><b>0</b></td>
+                                <td class="text-center text-danger"><b>18</b></td>
+                                <td class="text-center" id="D18"><b>0</b></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-sm">
+                <div class="form-check form-check-inline">
+                    <div class="form-check" id="listDiceScan"></div>
+                    <div class="form-check" id="listDiceScan1"></div>
+                    <div class="form-check" id="listDiceScan2"></div>
+                    <div class="form-check" id="listDiceScan3"></div>
+                    <div class="form-check" id="listDiceScan4"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div id="scaning">
+    </div>
+</body>
+<script>
+    var socket = io();
+    // socket_taixiu.emit('sendchat', 6 + 'Tao met roi do', "ac8e13e029b982e33561be212dbf9f1c"); //nhbn2019
+    var d1 = document.getElementById("dice1");
+    var d2 = document.getElementById("dice2");
+    var d3 = document.getElementById("dice3");
+    var listDice = [];
+    var listScan1 = [];
+    var listScan2 = [];
+    var listScan3 = [];
+    var listScan4 = [];
+    var listScan5 = [];
+    var oldMemberT = 0,
+        oldMemberX = 0;
+    var countMemberIncrease = 20;
+    socket.on("countDown", function(data) {
+        countDown(data);
+    });
+    socket.on("diceScan", function(data) {
+        $("#scaning").append(data._D1 +
+            "-" + data._D2 +
+            "-" + data._D3 + "</br>");
+    });
+    // socket.on("lastDice", function(data) {
+    //     showDice(data);
+    // });
+    socket.on("diceData", function(data) {
+        $("#_1").html(data.listPer[1]);
+        $("#_2").html(data.listPer[2]);
+        $("#_3").html(data.listPer[3]);
+        $("#_4").html(data.listPer[4]);
+        $("#_5").html(data.listPer[5]);
+        $("#_6").html(data.listPer[6]);
+        // Get List Dice Total
+        $("#D3").html(data.listTotal[3]);
+        $("#D4").html(data.listTotal[4]);
+        $("#D5").html(data.listTotal[5]);
+        $("#D6").html(data.listTotal[6]);
+        $("#D7").html(data.listTotal[7]);
+        $("#D8").html(data.listTotal[8]);
+        $("#D9").html(data.listTotal[9]);
+        $("#D10").html(data.listTotal[10]);
+        $("#D11").html(data.listTotal[11]);
+        $("#D12").html(data.listTotal[12]);
+        $("#D13").html(data.listTotal[13]);
+        $("#D14").html(data.listTotal[14]);
+        $("#D15").html(data.listTotal[15]);
+        $("#D16").html(data.listTotal[16]);
+        $("#D17").html(data.listTotal[17]);
+        $("#D18").html(data.listTotal[18]);
+    });
+    socket.on("listDice", function(data) {
+        var totalDice = 0;
+        var classIsTX = "table-light";
+        var oldTotal = 0;
+        listDice = data;
+        $("#listDice").html("");
+        $("#listDice").append('<table class="table">');
+        $("#listDice").append('<thead>');
+        $("#listDice").append('<tr class="text-center"><th>Dữ liệu phiên [' + data.length + ']</th></tr>');
+        $("#listDice").append('<thead>');
+        $("#listDice").append('<tbody>');
+        if (data.length < 14) {
+            for (let index = 0; index < data.length; index++) {
+                totalDice = parseInt(data[index].dice1) + parseInt(data[index].dice2) + parseInt(data[index].dice3);
+                if (totalDice > 10) {
+                    classIsTX = "table-dark";
+                } else {
+                    classIsTX = "table-light";
+                }
+                $("#listDice").append('<tr>');
+                $("#listDice").append('<td class="' + classIsTX + ' align-left"> #' + data[index].Id + ' [' + totalDice + ']' +
+                    ' (' + data[index].dice1 + '-' + data[index].dice2 + '-' + data[index].dice3 + ')' + ' [' + (totalDice - oldTotal) + ']');
+                $("#listDice").append('</tr>');
+                oldTotal = totalDice;
+                if (index == data.length - 1) {
+                    $("#lastDiceResult").html('#' + data[index].Id + ' [' + totalDice + ']' +
+                        ' (' + data[index].dice1 + '-' + data[index].dice2 + '-' + data[index].dice3 + ')');
+                }
+
+            }
+
+        } else {
+            for (let index = data.length - 14; index < data.length; index++) {
+                totalDice = parseInt(data[index].dice1) + parseInt(data[index].dice2) + parseInt(data[index].dice3);
+                if (totalDice > 10) {
+                    classIsTX = "table-dark";
+                } else {
+                    classIsTX = "table-light";
+                }
+                $("#listDice").append('<tr>');
+                $("#listDice").append('<td class="' + classIsTX + ' align-left"> #' + data[index].Id + ' [' + totalDice + ']' +
+                    ' (' + data[index].dice1 + '-' + data[index].dice2 + '-' + data[index].dice3 + ')' + ' [' + (totalDice - oldTotal) + ']');
+                $("#listDice").append('</tr>');
+                oldTotal = totalDice;
+                if (index == data.length - 1) {
+                    $("#lastDiceResult").html('#' + data[index].Id + ' [' + totalDice + ']' +
+                        ' (' + data[index].dice1 + '-' + data[index].dice2 + '-' + data[index].dice3 + ')');
+                }
+            }
+
+        }
+        var sessionIdCheck = 0;
+        var totalDiceCheck = 0;
+        var startIndex = data.length - 20;
+        if (data.length >= 50) {
+            startIndex = data.length - 20;
+        } else {
+            startIndex = 0;
+        }
+        for (let i = startIndex; i < data.length; i++) {
+            sessionIdCheck = parseInt(data[i].Id);
+            totalDiceCheck = parseInt(data[i].totalDice);
+            if (listScan1.length > 0) {
+                for (let index = 0; index < listScan1.length; index++) {
+                    if (sessionIdCheck == listScan1[index].Id) {
+                        if (totalDiceCheck > 10 && parseInt(listScan1[index].Total) > 10) {
+                            listScan1[index].ClassIsTX = "table-primary";
+                            break;
+                        } else if (totalDiceCheck <= 10 && parseInt(listScan1[index].Total) <= 10) {
+                            listScan1[index].ClassIsTX = "table-primary";
+                            break;
+                        } else {
+                            listScan1[index].ClassIsTX = "table-danger";
+                            break;
+                        }
+                    }
+                }
+            }
+            if (listScan3.length > 0) {
+                for (let index = 0; index < listScan3.length; index++) {
+                    if (sessionIdCheck == listScan3[index].Id) {
+                        if (totalDiceCheck > 10 && parseInt(listScan3[index].Total) > 10) {
+                            listScan3[index].ClassIsTX = "table-primary";
+                            break;
+                        } else if (totalDiceCheck <= 10 && parseInt(listScan3[index].Total) <= 10) {
+                            listScan3[index].ClassIsTX = "table-primary";
+                            break;
+                        } else {
+                            listScan3[index].ClassIsTX = "table-danger";
+                            break;
+                        }
+                    }
+                }
+            }
+            if (listScan2.length > 0) {
+                for (let index = 0; index < listScan2.length; index++) {
+                    if (sessionIdCheck == listScan2[index].Id) {
+                        if (totalDiceCheck > 10 && parseInt(listScan2[index].Total) > 10) {
+                            listScan2[index].ClassIsTX = "table-primary";
+                            break;
+                        } else if (totalDiceCheck <= 10 && parseInt(listScan2[index].Total) <= 10) {
+                            listScan2[index].ClassIsTX = "table-primary";
+                            break;
+                        } else {
+                            listScan2[index].ClassIsTX = "table-danger";
+                            break;
+                        }
+                    }
+                }
+            }
+            if (listScan4.length > 0) {
+                for (let index = 0; index < listScan4.length; index++) {
+                    if (sessionIdCheck == listScan4[index].Id) {
+                        if (totalDiceCheck > 10 && parseInt(listScan4[index].Total) > 10) {
+                            listScan4[index].ClassIsTX = "table-primary";
+                            break;
+                        } else if (totalDiceCheck <= 10 && parseInt(listScan4[index].Total) <= 10) {
+                            listScan4[index].ClassIsTX = "table-primary";
+                            break;
+                        } else {
+                            listScan4[index].ClassIsTX = "table-danger";
+                            break;
+                        }
+                    }
+                }
+            }
+            if (listScan5.length > 0) {
+                for (let index = 0; index < listScan5.length; index++) {
+                    if (sessionIdCheck == listScan5[index].Id) {
+                        if (totalDiceCheck > 10 && parseInt(listScan5[index].Total) > 10) {
+                            listScan5[index].ClassIsTX = "table-primary";
+                            break;
+                        } else if (totalDiceCheck <= 10 && parseInt(listScan5[index].Total) <= 10) {
+                            listScan5[index].ClassIsTX = "table-primary";
+                            break;
+                        } else {
+                            listScan5[index].ClassIsTX = "table-danger";
+                            break;
+                        }
+                    }
+                }
+            }
+            createList(listScan1, "listDiceScan");
+            createList(listScan2, "listDiceScan1");
+            createList(listScan3, "listDiceScan2");
+            createList(listScan4, "listDiceScan3");
+            createList(listScan5, "listDiceScan4");
+        }
+
+        $("#listDice").append('</tbody>');
+        $("#listDice").append('</table>');
+    });
+    $(document).ready(function() {
+        $("#getListDice").click(function() {
+            socket.emit("getListDice");
+        });
+        $("#scanDice").click(function() {
+            scanDice(listScan1, "listDiceScan");
+        });
+        $("#scanDice1").click(function() {
+            scanDice(listScan2, "listDiceScan1");
+        });
+        $("#scanDice2").click(function() {
+            scanDice(listScan3, "listDiceScan2");
+        });
+        $("#scanDiceAll").click(function() {
+            // $('#seedByTime').prop('checked', true);
+            // scanDice(listScan1, "listDiceScan");
+            // $('#seedById').prop('checked', true);
+            // scanDice(listScan2, "listDiceScan1");
+            $('#seedByText').prop('checked', true);
+            $('#seed').val("0");
+            scanDice(listScan2, "listDiceScan1");
+            $('#seed').val("1");
+            scanDice(listScan1, "listDiceScan");
+            $('#seed').val("2");
+            scanDice(listScan3, "listDiceScan2");
+            $('#seed').val("3");
+            scanDice(listScan4, "listDiceScan3");
+            $('#seed').val("4");
+            scanDice(listScan5, "listDiceScan4");
+        });
+    });
+    countDown = function(data) {
+        var MemberX = Math.floor(data._MemberX);
+        var MemberT = Math.floor(data._MemberT);
+        var countDown = Math.floor(data._countDown);
+        if (countDown == 0) {
+            $("#countDown").html(countDown);
+            $("#countDownTable").html(Math.floor(data._countDown));
+            $("#MemberX").removeAttr("style");
+            $("#MemberT").removeAttr("style");
+            countMemberIncrease = Math.floor((MemberX + MemberT) * 0.05);
+            return;
+        }
+        $("#countDown").html(countDown);
+        $("#MemberT").html(MemberT);
+        $("#MemberX").html(MemberX);
+        $("#TotalT").html(Math.floor(data._TotalT).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
+        $("#TotalX").html(Math.floor(data._TotalX).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
+        $("#countDownTable").html(Math.floor(data._countDown));
+        if (MemberT - oldMemberT >= countMemberIncrease) {
+            $("#MemberT").css("background", "#e85b38");
+            $("#MemberX").removeAttr("style");
+        } else if (MemberX - oldMemberX >= countMemberIncrease) {
+            $("#MemberX").css("background", "#e85b38");
+            $("#MemberT").removeAttr("style");
+        }
+        oldMemberT = MemberX;
+        oldMemberT = MemberT;
+    }
+    showDice = function(data) {
+        var dice1 = data._D1;
+        var dice2 = data._D2;
+        var dice3 = data._D3;
+        dice = {
+            1: '0 -2px',
+            2: '-103px -3px',
+            3: '-204px -3px',
+            4: '-305px -3px',
+            5: '-404px -3px',
+            6: '-507px -2px',
+        };
+        d1.style.background = "url('../img/dice.png') no-repeat " + dice[dice1];
+        d2.style.background = "url('../img/dice.png') no-repeat " + dice[dice2];
+        d3.style.background = "url('../img/dice.png') no-repeat " + dice[dice3];
+        d1.style.opacity = 1;
+        d2.style.opacity = 1;
+        d3.style.opacity = 1;
+    }
+    showDice = function(D1, D2, D3) {
+        dice = {
+            1: '0 -2px',
+            2: '-103px -3px',
+            3: '-204px -3px',
+            4: '-305px -3px',
+            5: '-404px -3px',
+            6: '-507px -2px',
+        };
+        d1.style.background = "url('../img/dice.png') no-repeat " + dice[D1];
+        d2.style.background = "url('../img/dice.png') no-repeat " + dice[D2];
+        d3.style.background = "url('../img/dice.png') no-repeat " + dice[D3];
+        d1.style.opacity = 1;
+        d2.style.opacity = 1;
+        d3.style.opacity = 1;
+    }
+    scanDice = function(listScan, divId) {
+        var SessionId = parseInt(listDice[listDice.length - 4].Id) + 3;
+        var type = 0;
+        var seedText = "";
+        if ($('#seedByTime').is(':checked')) {
+            type = 0;
+        }
+        if ($('#seedById').is(':checked')) {
+            type = 1;
+        }
+        if ($('#seedByText').is(':checked')) {
+            type = 2;
+            seedText = $('#seed').val();
+        }
+        var D1, D2, D3;
+        var oldTotal = 0;
+        var eTime = listDice[listDice.length - 4].Entime.toString().replace("T", " ");
+        var myDate = new Date(eTime.replace("+07:00", " ")); // Your timezone!
+        var seed = myDate.getTime();
+
+        Math.seedrandom(myDate);
+        var count = 0;
+        var diceCheck = parseInt(listDice[listDice.length - 1].dice1) + parseInt(listDice[listDice.length - 1].dice2) + parseInt(listDice[listDice.length - 1].dice3);
+        var dice2 = parseInt(listDice[listDice.length - 1].dice2);
+        //
+        //
+        var C1 = parseInt(listDice[listDice.length - 1].dice1);
+        var C2 = parseInt(listDice[listDice.length - 1].dice2);
+        var C3 = parseInt(listDice[listDice.length - 1].dice3);
+        //
+        var _1 = parseInt(listDice[listDice.length - 4].dice1);
+        var _2 = parseInt(listDice[listDice.length - 4].dice2);
+        var _3 = parseInt(listDice[listDice.length - 4].dice3);
+        //
+        var __1 = parseInt(listDice[listDice.length - 3].dice1);
+        var __2 = parseInt(listDice[listDice.length - 3].dice2);
+        var __3 = parseInt(listDice[listDice.length - 3].dice3);
+        //
+        var ___1 = parseInt(listDice[listDice.length - 2].dice1);
+        var ___2 = parseInt(listDice[listDice.length - 2].dice2);
+        var ___3 = parseInt(listDice[listDice.length - 2].dice3);
+        //
+        var isFound = false;
+        if (type == 0) {
+            Math.seedrandom(seed);
+        }
+        if (type == 1) {
+            Math.seedrandom(parseInt(listDice[listDice.length - 3].Id));
+        }
+        if (type == 2) {
+            Math.seedrandom(seedText);
+        }
+        listScan = [];
+        while (true) {
+            D1 = Dice();
+            D2 = Dice();
+            D3 = Dice();
+            isFound = false;
+            count++;
+            if (D1 == __1 && D2 == __2 && D3 == __3) {
+                D1 = Dice();
+                D2 = Dice();
+                D3 = Dice();
+                if (D1 == ___1 && D2 == ___2 && D3 == ___3) {
+                    for (let index = 0; index < 50; index++) {
+                        D1 = Dice();
+                        D2 = Dice();
+                        D3 = Dice();
+                        totalDice = D1 + D2 + D3;
+                        if (index == 0) {
+                            if (totalDice != diceCheck || D2 != dice2) {
+                                isFound = false;
+                                break;
+                            }
+                            isFound = true;
+                        }
+                        if (index == 1) {
+                            $("#scanStatus").html("Phiên tiếp theo : #" + SessionId + ' [' + totalDice + ']' + ' (' + D1 + '-' + D2 + '-' + D3 + ')');
+                        }
+                        if (totalDice > 10) {
+                            classIsTX = "table-dark";
+                        } else {
+                            classIsTX = "table-light";
+                        }
+                        listScan.push({
+                            Id: SessionId + index,
+                            Total: totalDice,
+                            ClassIsTX: classIsTX,
+                            Dice1: D1,
+                            Dice2: D2,
+                            Dice3: D3,
+                            Value: (totalDice - oldTotal)
+                        });
+                        oldTotal = totalDice;
+                    }
+                    if (isFound == true) {
+                        createList(listScan, divId);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    createList = function(list, id) {
+        $("#" + id).html("");
+        for (let i = 0; i < list.length; i++) {
+            $("#" + id).append('<tr class="table-bordered">');
+            $("#" + id).append('<td class="' + list[i].ClassIsTX + ' align-left"> #' + list[i].Id + ' [' + list[i].Total + ']' +
+                ' (' + list[i].Dice1 + '-' + list[i].Dice2 + '-' + list[i].Dice3 + ')' + ' [' + list[i].Value + ']');
+            $("#" + id).append('</tr>');
+        }
+        switch (id) {
+            case "listDiceScan":
+                listScan1 = list;
+                break;
+            case "listDiceScan1":
+                listScan2 = list;
+                break;
+            case "listDiceScan2":
+                listScan3 = list;
+                break;
+            case "listDiceScan3":
+                listScan4 = list;
+                break;
+            case "listDiceScan4":
+                listScan5 = list;
+                break;
+            default:
+                break;
+        }
+    };
+    Dice = function() {
+        return Math.floor(Math.random() * 6 + 1);
+    };
+</script>
+
+</html>
